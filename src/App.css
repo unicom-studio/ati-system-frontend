@@ -1,0 +1,55 @@
+/* App Layout & Global Animations */
+
+.spin-anim {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes toastIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .page-content-container {
+    padding: 20px 16px 36px;
+  }
+
+  .nav-search-box {
+    width: 200px;
+  }
+
+  .liquid-navbar {
+    padding: 0 16px;
+  }
+
+  .dashboard-hero-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px;
+  }
+
+  .hero-seal-badge {
+    width: 80px;
+    height: 80px;
+  }
+
+  .metrics-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-action-grid {
+    grid-template-columns: 1fr;
+  }
+}
