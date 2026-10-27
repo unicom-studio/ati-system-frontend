@@ -93,14 +93,24 @@ const saveStoredStudents = (students) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
 };
 
+const normalizeStudent = (student) => ({
+  ...student,
+  phone: student.phone || student.contactNo || '',
+  batch: student.batch || student.academicYear || '',
+});
+
+const getResponseData = (response) => response.data?.data ?? response.data;
+
 export const studentService = {
   // Fetch all students
   getAllStudents: async () => {
     try {
       const response = await api.get('/students');
-      if (response.data && Array.isArray(response.data)) {
-        saveStoredStudents(response.data);
-        return { data: response.data, source: 'backend' };
+      const students = getResponseData(response);
+      if (Array.isArray(students)) {
+        const normalizedStudents = students.map(normalizeStudent);
+        saveStoredStudents(normalizedStudents);
+        return { data: normalizedStudents, source: 'backend' };
       }
       return { data: getStoredStudents(), source: 'local' };
     } catch {
@@ -112,7 +122,7 @@ export const studentService = {
   getStudentById: async (id) => {
     try {
       const response = await api.get(`/students/${id}`);
-      return response.data;
+      return normalizeStudent(getResponseData(response));
     } catch {
       const all = getStoredStudents();
       return all.find((s) => s._id === id || s.regNo === id) || null;
@@ -121,49 +131,26 @@ export const studentService = {
 
   // Create new student
   createStudent: async (studentData) => {
-    try {
-      const response = await api.post('/students', studentData);
-      const newStudent = response.data;
-      const current = getStoredStudents();
-      saveStoredStudents([newStudent, ...current]);
-      return newStudent;
-    } catch {
-      const current = getStoredStudents();
-      const newStudent = {
-        _id: 'std_' + Date.now(),
-        createdAt: new Date().toISOString(),
-        status: 'Active',
-        ...studentData,
-      };
-      saveStoredStudents([newStudent, ...current]);
-      return newStudent;
-    }
+    const response = await api.post('/students', studentData);
+    const newStudent = normalizeStudent(getResponseData(response));
+    const current = getStoredStudents().filter((student) => student._id !== newStudent._id);
+    saveStoredStudents([newStudent, ...current]);
+    return newStudent;
   },
 
   // Update existing student
   updateStudent: async (id, updateData) => {
-    try {
-      const response = await api.put(`/students/${id}`, updateData);
-      const updated = response.data;
-      const current = getStoredStudents();
-      const next = current.map((s) => (s._id === id ? { ...s, ...updated } : s));
-      saveStoredStudents(next);
-      return updated;
-    } catch {
-      const current = getStoredStudents();
-      const next = current.map((s) => (s._id === id ? { ...s, ...updateData } : s));
-      saveStoredStudents(next);
-      return next.find((s) => s._id === id);
-    }
+    const response = await api.put(`/students/${id}`, updateData);
+    const updated = normalizeStudent(getResponseData(response));
+    const current = getStoredStudents();
+    const next = current.map((student) => (student._id === id ? updated : student));
+    saveStoredStudents(next);
+    return updated;
   },
 
   // Delete student
   deleteStudent: async (id) => {
-    try {
-      await api.delete(`/students/${id}`);
-    } catch {
-      // Fallback
-    }
+    await api.delete(`/students/${id}`);
     const current = getStoredStudents();
     const next = current.filter((s) => s._id !== id);
     saveStoredStudents(next);

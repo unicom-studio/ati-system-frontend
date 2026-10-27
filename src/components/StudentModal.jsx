@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, User, Hash, CreditCard, Calendar } from 'lucide-react';
+import { X, Save, User, Hash, CreditCard, Calendar, Phone } from 'lucide-react';
 
 const ATI_COURSES = [
   'Higher National Diploma in Information Technology (HNDIT)',
@@ -156,6 +156,15 @@ export const StudentModal = ({ isOpen, onClose, onSave, studentToEdit = null }) 
                 <input type="email" className="glass-input" placeholder="student@ati.edu.lk"
                   value={formData.email} onChange={(e) => field({ email: e.target.value })} />
               </div>
+            </div>
+          </div>
+
+          <div className="glass-input-group">
+            <label className="glass-label">Phone Number</label>
+            <div className="glass-input-wrapper">
+              <input type="tel" className="glass-input with-icon" placeholder="+94 77 123 4567"
+                value={formData.phone} onChange={(e) => field({ phone: e.target.value })} />
+              <Phone size={14} className="glass-input-icon" />
             </div>
           </div>
 

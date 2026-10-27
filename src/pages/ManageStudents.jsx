@@ -57,17 +57,23 @@ export const ManageStudents = () => {
       setToastType('success');
       setModalOpen(false); setStudentToEdit(null);
       fetchStudents();
-    } catch {
-      setToastType('error'); setToastMessage('Operation failed. Saved to local cache.');
+    } catch (error) {
+      setToastType('error');
+      setToastMessage(error.response?.data?.message || error.message || 'Could not save student.');
     }
   };
 
   const handleDelete = async (id, name) => {
     if (window.confirm(`Remove ${name} from the registry?`)) {
-      await studentService.deleteStudent(id);
-      setToastType('success');
-      setToastMessage(`${name} removed from registry.`);
-      fetchStudents();
+      try {
+        await studentService.deleteStudent(id);
+        setToastType('success');
+        setToastMessage(`${name} removed from registry.`);
+        fetchStudents();
+      } catch (error) {
+        setToastType('error');
+        setToastMessage(error.response?.data?.message || error.message || 'Could not remove student.');
+      }
     }
   };
 
